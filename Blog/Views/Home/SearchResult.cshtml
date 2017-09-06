@@ -1,0 +1,38 @@
+﻿@model Blog.Models.SearchViewModel
+@using Blog.Properties
+@using Blog.Helpers
+@{
+    ViewBag.Title = Resources.SEARCH;
+}
+
+<div class="row panel panel-default">
+    <div class="panel-heading">
+        <h1>Результаты поиска "@Model.Text"</h1>
+    </div>
+    <br />
+    @foreach (var item in Model.Articles)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2>@item.Title</h2>
+                <h3>@Html.ActionLink(item.Nickname, "Manage", "Home", new { nick = item.Nickname }, htmlAttributes: new { title = "Manage" })</h3>
+                <h4>@item.UploadDate.ToString()</h4>
+            </div>
+            <p class="panel-body">@item.Text</p>
+            <div class="btn-group-lg text-right panel-footer">
+                @Html.ActionLink(Resources.OPEN, "OpenArticle", "Home", new { id = @item.ArticleId }, new { @class = "btn-primary btn-lg" })
+            </div>
+        </div>
+    }
+    <br />
+    <div class="btn-group-lg panel-footer">
+        @if (Model.tagid != -1)
+        {
+            Html.PageLinks(Model.PageInfo, x => Url.Action(Model.Method, new { tagId = Model.tagid, page = x }));
+        }
+        else
+        {
+            Html.PageLinks(Model.PageInfo, x => Url.Action(Model.Method, new { searchText = Model.Text, page = x }));
+        }
+    </div>
+</div>

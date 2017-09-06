@@ -1,0 +1,115 @@
+﻿@model Blog.Models.ArticleModel
+@using Blog.Properties
+
+@{
+    ViewBag.Title = Model.Title;
+}
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <div class="btn-group pull-right">
+            @if (User.IsInRole("admin"))
+            {
+                @Html.ActionLink(Resources.CHANGE_STATUS, "ChangeArticleStatus", new { id = Model.ArticleId }, new { @class = "openModalView btn btn-primary" });
+            }
+        </div>
+        <h2>@Model.Title</h2>
+        <h4>@Html.ActionLink(Model.Nickname, "Manage", "Home", new { nick = Model.Nickname }, htmlAttributes: new { title = "Manage" })</h4>
+        <h5>@Model.UploadDate.ToString()</h5>
+    </div>
+
+
+
+    <div id="modDialog" class="modal fade">
+        <div id="dialogContent" class="modal-dialog"></div>
+    </div>
+
+    <p class="panel-body">@Model.Text</p>
+    <div class="panel-footer">
+        <div class="btn-group-lg text-right">
+            @if (Model.UserCanChangeRating)
+            {
+                <p>
+                    @Html.ActionLink("+", "ChangeRating", "Home", new { aid = Model.ArticleId, plus = true, nick = User.Identity.Name }, new { @class = "btn-primary btn-lg" })
+                    @Model.Rating.ToString()
+                    @Html.ActionLink("-", "ChangeRating", "Home", new { aid = Model.ArticleId, plus = false, nick = User.Identity.Name }, new { @class = "btn-primary btn-lg" })
+                </p>
+            }
+            else
+            {
+                <p>
+                    @Model.Rating.ToString()
+                </p>
+            }
+            @if (Model.Nickname == User.Identity.Name || User.IsInRole("admin"))
+            {
+                <p>
+                    @Html.ActionLink(Resources.DELETE, "DeleteArticle", new { articleId = Model.ArticleId }, new { @class = "btn btn-primary" })
+                </p>
+            }
+        </div>
+        <div>
+            <h4>Теги</h4>
+            <p>
+                @foreach (var item in Model.Tags)
+                {
+                    @Html.ActionLink(@item.Value + ", ", "SearchByTag", "Home", new { tagId = item.Key }, null)
+                }
+            </p>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <h4>@Resources.COMMENTS</h4>
+        @if (Model.Status == "ReadOnly")
+        {
+            <h5>@Resources.COMMENTS_DISABLE</h5>
+        }
+        else
+        {
+            <div>
+                @if (User.IsInRole("blocked") || !User.Identity.IsAuthenticated)
+                {
+                    <h5>@Resources.COMMENTS_DISABLE_FOR_YOU</h5>
+                }
+                else
+                {
+                    using (Html.BeginForm("Commenting", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "newCommentForm" }))
+                    {
+                        @Html.HiddenFor(m => Model.ArticleId, new { name = "ArticleId" });
+                        @Html.Hidden("Nickname", User.Identity.Name);
+                        <div class="form-group">
+                            @Html.TextArea("CommentText", new { @class = "form-control fixtextarea", id = "newComment", name = "CommentText" })
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value=@Resources.COMMENTING class="btn btn-primary" />
+                        </div>
+                    }
+                }
+            </div>
+            foreach (var item in Model.Comments)
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <p class="h4">@item.Nickname</p>
+                        <p class="h5">@item.Date.ToString()</p>
+                    </div>
+                    <p class="panel-body">@item.Text</p>
+                    <div class="panel-footer text-right">
+                        @if (item.Nickname == User.Identity.Name || User.IsInRole("moder"))
+                    {
+                            <p>
+                                @Html.ActionLink(Resources.DELETE, "DeleteComment", new { commentId = item.CommentId, articleId = Model.ArticleId }, new { @class = "btn btn-primary" })
+                            </p>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/Scripts/ModalView.js")
+}

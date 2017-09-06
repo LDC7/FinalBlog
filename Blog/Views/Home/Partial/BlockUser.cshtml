@@ -1,0 +1,38 @@
+﻿@model Blog.Models.BanUserModel
+@using Blog.Properties
+
+
+@using (Html.BeginForm("BaningUser", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    <div class="modal-content">
+        @Html.AntiForgeryToken()
+        <div class="modal-header">
+            <h4>@Resources.BLOCK_USER_N @Model.UserId</h4>
+        </div>
+        <div class="modal-body">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(m => Model.UserId)
+            <p>
+                @Html.Label(Resources.BLOCK_FOR_MINUTES, new { @class = "col-md-0 control-label" })
+            </p>
+            <p>
+                @Html.TextBoxFor(m => m.Period, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Period, "", new { @class = "text-danger" })
+            </p>
+            <p>
+                @Html.LabelFor(m => m.Reason, new { @class = "col-md-0 control-label" })
+            </p>
+            <p>
+                @Html.TextBoxFor(m => m.Reason, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Reason, "", new { @class = "text-danger" })
+            </p>
+        </div>
+        <div class="modal-footer">
+            <div class="form-group">
+                <div class="col-md-offset-3 col-md-9">
+                    <input type="submit" value=@Resources.BAN class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    </div>
+}

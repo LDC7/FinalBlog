@@ -1,0 +1,35 @@
+﻿@model Blog.Models.IndexViewModel
+@using Blog.Properties
+@using Blog.Helpers
+@{
+    ViewBag.Title = Resources.FEED;
+}
+
+<div class="row panel panel-default">
+    <div class="panel-heading">
+        @Html.ActionLink(Resources.CREATE_ARTICLE, "CreateArticle", "Home", null, new { @class = "btn-primary btn-lg" })
+        @if (User.IsInRole("moder"))
+        {
+            @Html.ActionLink(Resources.BLOCKED_ARTICLES, "BlockedArticles", "Home", null, new { @class = "btn-primary btn-lg" })
+        }
+    </div>
+    <br />
+    @foreach (var item in Model.Articles)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2>@item.Title</h2>
+                <h3>@Html.ActionLink(item.Nickname, "Manage", "Home", new { nick = item.Nickname }, htmlAttributes: new { title = "Manage" })</h3>
+                <h4>@item.UploadDate.ToString()</h4>
+            </div>
+            <p class="panel-body">@item.Text</p>
+            <div class="btn-group-lg text-right panel-footer">
+                @Html.ActionLink("Открыть", "OpenArticle", "Home", new { id = @item.ArticleId }, new { @class = "btn-primary btn-lg" })
+            </div>
+        </div>
+    }
+    <br />
+    <div class="btn-group-lg panel-footer">
+        @Html.PageLinks(Model.PageInfo, x => Url.Action("Index", new { page = x }))
+    </div>
+</div>

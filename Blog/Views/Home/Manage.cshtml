@@ -1,0 +1,83 @@
+﻿@model Blog.Models.ManageUserViewModel
+@using Blog.Properties
+@using Blog.Helpers
+@{
+    ViewBag.Title = Model.Nickname;
+}
+
+
+<div class="row panel panel-default">
+    <div class="panel-heading">
+        @if (User.IsInRole("moder") && Model.Status != "admin")
+        {
+            <div class="btn-group pull-right">
+                @if (User.IsInRole("admin"))
+                {
+                    if (Model.Status != "blocked")
+                    {
+                        @Html.ActionLink(Resources.CHANGE_STATUS, "ChangeUserStatus", new { id = Model.UserId }, new { @class = "openModalView btn btn-primary btn-lg" })
+                    }
+                }
+                @if (Model.Status != "moder")
+                {
+                    if (Model.Status == "blocked")
+                    {
+                        @Html.ActionLink(Resources.UNBAN, "UnBanUser", new { uid = Model.UserId }, new { @class = "openModalView btn btn-primary btn-lg" })
+                    }
+                    else
+                    {
+                        @Html.ActionLink(Resources.BAN, "BanUser", new { uid = Model.UserId }, new { @class = "openModalView btn btn-primary btn-lg" })
+                    }
+                }
+            </div>
+        }
+        <dl class="dl-horizontal h2">
+            <dt>
+                @Html.DisplayNameFor(model => model.Nickname)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Nickname)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Status)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Status)
+            </dd>
+        </dl>
+    </div>
+
+    <h3>
+        @Resources.POSTS @Model.Nickname
+    </h3>
+
+    <div id="modDialog" class="modal fade">
+        <div id="dialogContent" class="modal-dialog"></div>
+    </div>
+
+    @foreach (var item in Model.Articles)
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h2>@item.Title</h2>
+                <h3>@item.Nickname</h3>
+                <h4>@item.UploadDate.ToString()</h4>
+            </div>
+            <p class="panel-body">@item.Text</p>
+            <div class="btn-group-lg text-right panel-footer">
+                @Html.ActionLink(Resources.OPEN, "OpenArticle", "Home", new { id = @item.ArticleId }, new { @class = "btn-primary btn-lg" })
+            </div>
+        </div>
+    }
+    <br />
+    <div class="btn-group-lg panel-footer">
+        @Html.PageLinks(Model.PageInfo, x => Url.Action("Manage", new { page = x }))
+    </div>
+</div>
+
+@section scripts
+{
+    @Scripts.Render("~/Scripts/ModalView.js")
+}

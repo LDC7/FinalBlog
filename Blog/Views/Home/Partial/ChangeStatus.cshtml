@@ -1,0 +1,33 @@
+﻿@model Blog.Models.ChangeStatus
+@using Blog.Properties
+
+
+@using (Html.BeginForm(Model.Redirect, "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    <div class="modal-content">
+        @Html.AntiForgeryToken()
+        <div class="modal-header">
+            <h4>
+                @Model.Title
+                @Model.Id
+            </h4>
+        </div>
+        <div class="modal-body">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @Html.HiddenFor(m => m.Id)
+            <p>
+                @Html.Label(Resources.CHANGE_STATUS, new { @class = "col-md-0 control-label" })
+            </p>
+            <p>
+                @Html.DropDownListFor(m => m.SelectedStatus, new SelectList(Model.StatusList));
+            </p>
+        </div>
+        <div class="modal-footer">
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value=@Resources.OK class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    </div>
+}
